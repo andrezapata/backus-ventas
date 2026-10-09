@@ -29,7 +29,7 @@
         <span class="note-dot"></span>
         <div>
           <strong>Modo de trabajo</strong>
-          <span>Catálogo listo sin señal</span>
+          <span>{{ conectado ? 'Catálogo listo en línea' : 'Catálogo disponible desde caché' }}</span>
         </div>
       </div>
       <div class="profile">
@@ -49,9 +49,9 @@
       <div class="topbar-actions">
         <div class="connection-pill" [class.is-offline]="!conectado" role="status" aria-live="polite">
           @if (conectado) {
-            <svg lucideWifi [size]="15"></svg><span>En línea</span>
+            <svg lucideWifi [size]="15"></svg><span>CONECTADO</span>
           } @else {
-            <svg lucideWifiOff [size]="15"></svg><span>Sin conexión</span>
+            <svg lucideWifiOff [size]="15"></svg><span>SIN CONEXIÓN</span>
           }
         </div>
         <span class="topbar-date"><svg lucideClock [size]="15"></svg> Precios al 01 oct. 2026</span>
@@ -199,7 +199,7 @@
           <span class="toast-check">
             @if (pedidoRechazado) { <svg lucideWifiOff [size]="16"></svg> } @else { <svg lucideCheck [size]="16"></svg> }
           </span>
-          <span><strong>{{ pedidoRechazado ? 'Pedido no registrado' : 'Pedido ' + numeroPedido }}</strong><small>{{ mensajePedido }}</small></span>
+          <span><strong>{{ pedidoRechazado ? 'Pedido guardado localmente' : 'Pedido ' + numeroPedido }}</strong><small>{{ mensajePedido }}</small></span>
           <button type="button" (click)="pedidoRegistrado = false" aria-label="Cerrar aviso"><svg lucideX [size]="16"></svg></button>
         </div>
       }
@@ -257,7 +257,7 @@
               <div><span class="record-folio">{{ registro.folio }}</span><strong>{{ registro.cliente }}</strong></div>
               <strong class="record-total">{{ formatoPrecio(registro.total) }}</strong>
             </div>
-            <div class="record-meta"><span>{{ registro.fecha }}</span><span>{{ registro.cantidad }} {{ registro.cantidad === 1 ? 'unidad' : 'unidades' }}</span><span class="record-status">Registrado</span></div>
+            <div class="record-meta"><span>{{ registro.fecha }}</span><span>{{ registro.cantidad }} {{ registro.cantidad === 1 ? 'unidad' : 'unidades' }}</span><span class="record-status" [class.record-pending]="registro.estado === 'PENDIENTE'">{{ registro.estado }}</span></div>
             <div class="record-meta record-extra"><span>Entrega: {{ registro.fechaEntrega }}</span><span>{{ registro.metodoPago }}</span></div>
             @if (registro.contacto) { <p class="record-contacto">Contacto: {{ registro.contacto }}</p> }
             @if (registro.notas) { <p class="record-contacto">Nota: {{ registro.notas }}</p> }

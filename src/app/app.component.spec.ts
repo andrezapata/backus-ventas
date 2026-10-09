@@ -43,7 +43,7 @@ describe('AppComponent', () => {
     expect(app.importeTotal).toBe(6.8);
   });
 
-  it('keeps the cart when an order is submitted offline', () => {
+  it('saves an offline order locally as pending', () => {
     const app = TestBed.createComponent(AppComponent).componentInstance;
     const product = { id: 1, nombre: 'Cristal 620 ml', categoria: 'Cerveza', precio: 3.4, stock: 120 };
     app.carrito = [{ producto: product, cantidad: 2 }];
@@ -51,9 +51,10 @@ describe('AppComponent', () => {
 
     app.registrarPedido();
 
-    expect(app.carrito.length).toBe(1);
+    expect(app.carrito.length).toBe(0);
     expect(app.pedidoRechazado).toBeTrue();
-    expect(app.mensajePedido).toContain('el pedido no se guardó');
+    expect(app.registrosPedidos[0].estado).toBe('PENDIENTE');
+    expect(app.mensajePedido).toContain('guardado localmente');
   });
 
   it('saves a confirmed order and opens the records modal', () => {

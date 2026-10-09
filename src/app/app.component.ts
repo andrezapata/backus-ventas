@@ -45,6 +45,7 @@ interface RegistroPedido {
   contacto: string;
   metodoPago: string;
   notas: string;
+  estado: 'PENDIENTE' | 'REGISTRADO';
   lineas: LineaCarrito[];
   cantidad: number;
   total: number;
@@ -163,6 +164,10 @@ export class AppComponent implements OnInit {
     return this.clienteActual.charAt(0).toUpperCase();
   }
 
+  get estadoConexion(): string {
+    return this.conectado ? 'CONECTADO' : 'SIN CONEXIÓN';
+  }
+
   readonly imagenesProducto: Record<number, string> = {
     1: '/cristal.png',
     2: '/images.png',
@@ -229,27 +234,28 @@ export class AppComponent implements OnInit {
     if (this.carrito.length === 0) return;
 
     if (!this.conectado) {
+      const folio = `BV-P-${String(Date.now()).slice(-6)}`;
+      const registroPendiente: RegistroPedido = this.crearRegistro(folio, 'PENDIENTE');
+      this.registrosPedidos = [registroPendiente, ...this.registrosPedidos];
+      this.guardarRegistros();
+      this.productos = this.productos.map((producto) => {
+        const linea = this.carrito.find((item) => item.producto.id === producto.id);
+        return linea ? { ...producto, stock: producto.stock - linea.cantidad } : producto;
+      });
       this.pedidoRechazado = true;
-      this.numeroPedido = '';
-      this.mensajePedido = 'Sin conexión: el pedido no se guardó. Para pedidos offline reales se requiere IndexedDB y sincronización.';
+      this.numeroPedido = folio;
+      this.mensajePedido = 'Pedido guardado localmente. Estado: PENDIENTE. Se sincronizará al recuperar la conexión.';
       this.pedidoRegistrado = true;
       this.checkoutAbierto = false;
+      this.vaciarCarrito();
+      this.nombreCliente = '';
+      this.nombreNegocio = '';
+      this.notasPedido = '';
       return;
     }
 
     const folio = `BV-${String(Date.now()).slice(-6)}`;
-    const registro: RegistroPedido = {
-      folio,
-      fecha: new Intl.DateTimeFormat('es-PE', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date()),
-      fechaEntrega: this.fechaEntrega,
-      cliente: this.nombreNegocio.trim() || this.clienteActual,
-      contacto: this.nombreCliente.trim(),
-      metodoPago: this.metodoPago,
-      notas: this.notasPedido.trim(),
-      lineas: this.carrito.map((linea) => ({ ...linea, producto: { ...linea.producto } })),
-      cantidad: this.cantidadTotal,
-      total: this.importeTotal,
-    };
+    const registro = this.crearRegistro(folio, 'REGISTRADO');
     this.numeroPedido = folio;
     this.registrosPedidos = [registro, ...this.registrosPedidos];
     this.guardarRegistros();
@@ -269,6 +275,22 @@ export class AppComponent implements OnInit {
     this.nombreNegocio = '';
     this.notasPedido = '';
     this.fechaEntrega = this.obtenerFechaRelativa(1);
+  }
+
+  private crearRegistro(folio: string, estado: RegistroPedido['estado']): RegistroPedido {
+    return {
+      folio,
+      fecha: new Intl.DateTimeFormat('es-PE', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date()),
+      fechaEntrega: this.fechaEntrega,
+      cliente: this.nombreNegocio.trim() || this.clienteActual,
+      contacto: this.nombreCliente.trim(),
+      metodoPago: this.metodoPago,
+      notas: this.notasPedido.trim(),
+      estado,
+      lineas: this.carrito.map((linea) => ({ ...linea, producto: { ...linea.producto } })),
+      cantidad: this.cantidadTotal,
+      total: this.importeTotal,
+    };
   }
 
   private obtenerFechaRelativa(dias: number): string {
