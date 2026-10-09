@@ -1,0 +1,279 @@
+<div class="app-shell">
+  <aside class="sidebar" aria-label="Navegación principal">
+    <a class="brand" href="#inicio" aria-label="Backus Ventas, inicio">
+      <span class="brand-mark">B<span>.</span></span>
+      <span class="brand-name">Backus<span>Ventas</span></span>
+    </a>
+
+    <div class="sidebar-group">
+      <p class="sidebar-caption">VENTAS</p>
+      <a class="nav-link is-active" href="#catalog-title" aria-current="page" aria-label="Catálogo" title="Catálogo">
+        <svg lucideStore [size]="18"></svg>
+        <span>Catálogo</span>
+        <span class="nav-count">{{ productos.length }}</span>
+      </a>
+      <a class="nav-link" href="#order-title" aria-label="Pedido actual" title="Pedido actual">
+        <svg lucideShoppingCart [size]="18"></svg>
+        <span>Pedido actual</span>
+        <span class="nav-count">{{ cantidadTotal }}</span>
+      </a>
+      <button class="nav-link" type="button" (click)="abrirRegistros()" aria-label="Registros de pedidos" title="Registros de pedidos">
+        <svg lucideClock [size]="18"></svg>
+        <span>Registros</span>
+        <span class="nav-count">{{ registrosPedidos.length }}</span>
+      </button>
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="sidebar-note">
+        <span class="note-dot"></span>
+        <div>
+          <strong>Modo de trabajo</strong>
+          <span>Catálogo listo sin señal</span>
+        </div>
+      </div>
+      <div class="profile">
+        <div class="avatar">CM</div>
+        <div class="profile-copy">
+          <strong>Andre Zapata</strong>
+          <span>Backus Ventas</span>
+        </div>
+        <span class="profile-menu" aria-hidden="true">···</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-column" id="inicio">
+    <header class="topbar">
+      <div class="breadcrumb"><span>Ventas</span><svg lucideChevronRight [size]="14"></svg><strong>Catálogo</strong></div>
+      <div class="topbar-actions">
+        <div class="connection-pill" [class.is-offline]="!conectado" role="status" aria-live="polite">
+          @if (conectado) {
+            <svg lucideWifi [size]="15"></svg><span>En línea</span>
+          } @else {
+            <svg lucideWifiOff [size]="15"></svg><span>Sin conexión</span>
+          }
+        </div>
+        <span class="topbar-date"><svg lucideClock [size]="15"></svg> Precios al 01 oct. 2026</span>
+      </div>
+    </header>
+
+    <main class="page-content">
+      <section class="welcome-row" aria-labelledby="welcome-title">
+        <div>
+          <p class="eyebrow">VIERNES, 02 DE OCTUBRE DE 2026 <span></span> RUTA LIMA CENTRO</p>
+          <h1 id="welcome-title">Buen día, Andre</h1>
+          <p class="welcome-copy">Todo listo para tu próxima visita. Arma el pedido desde aquí.</p>
+        </div>
+        <div class="route-tag"><span class="route-symbol">L</span><span><strong>Ruta 04</strong><small>Lima Centro</small></span></div>
+      </section>
+
+      <section class="metric-strip" aria-label="Resumen del catálogo">
+        <div class="metric">
+          <span class="metric-icon blue-icon"><svg lucideStore [size]="18"></svg></span>
+          <div><span class="metric-label">Productos disponibles</span><strong>{{ productos.length }} <small>referencias</small></strong></div>
+        </div>
+        <div class="metric-divider"></div>
+        <div class="metric">
+          <span class="metric-icon green-icon"><span class="stock-mark">↗</span></span>
+          <div><span class="metric-label">Unidades en catálogo</span><strong>{{ stockDisponibleTotal }} <small>unidades</small></strong></div>
+        </div>
+        <div class="metric-divider"></div>
+        <div class="metric">
+          <span class="metric-icon red-icon"><svg lucideShoppingCart [size]="18"></svg></span>
+          <div><span class="metric-label">Tu pedido</span><strong>{{ cantidadTotal }} <small>unidades</small></strong></div>
+        </div>
+        <div class="metric-aside"><span class="live-dot"></span> Catálogo académico</div>
+      </section>
+
+      <div class="sales-layout">
+        <section class="catalog-section" aria-labelledby="catalog-title">
+          <div class="catalog-heading">
+            <div>
+              <div class="section-kicker">PORTAFOLIO</div>
+              <h2 id="catalog-title">Catálogo de productos</h2>
+              <p>Precios y stock son datos ficticios para este ejercicio.</p>
+            </div>
+            <label class="search-box">
+              <svg lucideSearch [size]="18"></svg>
+              <input type="search" placeholder="Buscar producto" [(ngModel)]="busqueda" aria-label="Buscar producto" />
+              <kbd>/</kbd>
+            </label>
+          </div>
+
+          <div class="catalog-toolbar">
+            <div class="category-tabs" role="group" aria-label="Filtrar por categoría">
+              @for (categoria of categorias; track categoria) {
+                <button type="button" class="category-tab" [class.is-selected]="categoriaActiva === categoria" (click)="categoriaActiva = categoria">
+                  {{ categoria }}
+                </button>
+              }
+            </div>
+            <span class="result-count">{{ productosVisibles.length }} resultados</span>
+          </div>
+
+          @if (cargando) {
+            <div class="state-panel"><span class="loading-ring"></span><span>Cargando catálogo...</span></div>
+          } @else if (errorCatalogo) {
+            <div class="state-panel error-state"><strong>No se pudo cargar el catálogo.</strong><span>Conéctate o vuelve a intentarlo cuando el recurso esté disponible.</span></div>
+          } @else {
+            <div class="product-grid">
+              @for (producto of productosVisibles; track producto.id) {
+                <article class="product-card">
+                  <div class="product-visual" [class.product-one]="producto.id === 1" [class.product-two]="producto.id === 2" [class.product-three]="producto.id === 3">
+                    <img [ngSrc]="imagenesProducto[producto.id]" [width]="dimensionesImagen[producto.id].width" [height]="dimensionesImagen[producto.id].height" [priority]="producto.id === 1" [alt]="producto.nombre" />
+                    <span class="product-family">{{ producto.categoria }}</span>
+                    <span class="product-number">0{{ producto.id }}</span>
+                  </div>
+                  <div class="product-details">
+                    <div class="product-title-row"><span class="product-category">{{ producto.categoria }}</span><span class="stock-status"><i></i> En stock</span></div>
+                    <h3>{{ producto.nombre }}</h3>
+                    <div class="product-bottom">
+                      <div><strong class="product-price">{{ formatoPrecio(producto.precio) }}</strong><span class="price-unit">por unidad</span></div>
+                      <button class="add-button" type="button" (click)="agregar(producto)" [disabled]="cantidadEnCarrito(producto.id) >= producto.stock" [attr.aria-label]="'Agregar ' + producto.nombre + ' al pedido'">
+                        <svg lucidePlus [size]="17"></svg>
+                      </button>
+                    </div>
+                    <div class="stock-line"><span>Disponible</span><strong>{{ producto.stock }} und.</strong></div>
+                  </div>
+                </article>
+              } @empty {
+                <div class="empty-results"><span class="empty-search"><svg lucideSearch [size]="22"></svg></span><strong>No encontramos productos</strong><span>Prueba con otro nombre o categoría.</span></div>
+              }
+            </div>
+          }
+
+          <div class="catalog-footnote"><span class="footnote-mark">i</span><span>Los precios y existencias pueden cambiar. Confirma la información antes de cerrar una venta.</span></div>
+        </section>
+
+        <aside class="order-panel" aria-labelledby="order-title">
+          <div class="order-header">
+            <div><span class="section-kicker">VENTA EN CURSO</span><h2 id="order-title">Pedido actual</h2></div>
+            <span class="order-count">{{ cantidadTotal }}</span>
+          </div>
+
+          <div class="customer-select">
+            <span class="customer-initial">{{ inicialCliente }}</span>
+            <div><span class="customer-caption">CLIENTE</span><strong>{{ clienteActual }}</strong></div>
+            <button class="customer-change" type="button" (click)="cambiarCliente()" title="Cambiar cliente" aria-label="Cambiar cliente">···</button>
+          </div>
+
+          @if (carrito.length > 0) {
+            <div class="cart-items">
+              @for (linea of carrito; track linea.producto.id) {
+                <div class="cart-line">
+                  <div class="cart-product-copy"><strong>{{ linea.producto.nombre }}</strong><span>{{ formatoPrecio(linea.producto.precio) }} c/u</span></div>
+                  <div class="quantity-control">
+                    <button type="button" (click)="quitar(linea.producto.id)" [attr.aria-label]="'Quitar una unidad de ' + linea.producto.nombre"><svg lucideMinus [size]="13"></svg></button>
+                    <span>{{ linea.cantidad }}</span>
+                    <button type="button" (click)="agregar(linea.producto)" [disabled]="linea.cantidad >= linea.producto.stock" [attr.aria-label]="'Agregar una unidad de ' + linea.producto.nombre"><svg lucidePlus [size]="13"></svg></button>
+                  </div>
+                  <strong class="line-total">{{ formatoPrecio(linea.producto.precio * linea.cantidad) }}</strong>
+                </div>
+              }
+              <button class="clear-cart" type="button" (click)="vaciarCarrito()">Vaciar pedido</button>
+            </div>
+          } @else {
+            <div class="cart-empty">
+              <span class="cart-empty-icon"><svg lucideShoppingCart [size]="22"></svg></span>
+              <strong>Tu pedido está vacío</strong>
+              <span>Agrega productos del catálogo para empezar.</span>
+            </div>
+          }
+
+          <div class="order-summary">
+            <div class="summary-row"><span>Subtotal</span><strong>{{ formatoPrecio(importeTotal) }}</strong></div>
+            <div class="summary-row muted-row"><span>IGV</span><span>Incluido</span></div>
+            <div class="summary-row muted-row"><span>Productos distintos</span><span>{{ cantidadLineas }}</span></div>
+            <div class="summary-total"><span>Total</span><strong>{{ formatoPrecio(importeTotal) }}</strong></div>
+            <button class="checkout-button" type="button" (click)="abrirCheckout()" [disabled]="carrito.length === 0">
+              <span>Continuar pedido</span><svg lucideChevronRight [size]="18"></svg>
+            </button>
+            <p class="order-disclaimer">Pedido académico de demostración. No se envía a una API.</p>
+          </div>
+        </aside>
+      </div>
+
+      @if (pedidoRegistrado) {
+        <div class="toast" [class.toast-warning]="pedidoRechazado" role="status" aria-live="polite">
+          <span class="toast-check">
+            @if (pedidoRechazado) { <svg lucideWifiOff [size]="16"></svg> } @else { <svg lucideCheck [size]="16"></svg> }
+          </span>
+          <span><strong>{{ pedidoRechazado ? 'Pedido no registrado' : 'Pedido ' + numeroPedido }}</strong><small>{{ mensajePedido }}</small></span>
+          <button type="button" (click)="pedidoRegistrado = false" aria-label="Cerrar aviso"><svg lucideX [size]="16"></svg></button>
+        </div>
+      }
+    </main>
+
+    <footer class="page-footer"><span>BACKUS VENTAS <i>·</i> CASO ACADÉMICO</span><span>Runtime caching activo en producción</span></footer>
+  </div>
+</div>
+
+@if (checkoutAbierto) {
+  <div class="modal-backdrop" (click)="checkoutAbierto = false" (keydown.escape)="checkoutAbierto = false">
+    <section class="checkout-modal" role="dialog" aria-modal="true" aria-labelledby="checkout-title" (click)="$event.stopPropagation()">
+      <button class="modal-close" type="button" (click)="checkoutAbierto = false" aria-label="Cerrar"><svg lucideX [size]="19"></svg></button>
+      <span class="modal-kicker">RESUMEN DE VENTA</span>
+      <h2 id="checkout-title">Registrar pedido</h2>
+      <p class="modal-intro">Revisa el total e identifica al cliente para crear el registro de demostración.</p>
+      <div class="modal-total"><span>{{ cantidadTotal }} {{ cantidadTotal === 1 ? 'producto' : 'productos' }}</span><strong>{{ formatoPrecio(importeTotal) }}</strong></div>
+      <form (ngSubmit)="registrarPedido()">
+        <label class="form-field"><span>Nombre del contacto</span><input name="nombreCliente" [(ngModel)]="nombreCliente" autocomplete="name" placeholder="Ej. María Pérez" required /></label>
+        <label class="form-field"><span>Nombre del negocio</span><input name="nombreNegocio" [(ngModel)]="nombreNegocio" autocomplete="organization" placeholder="Ej. Bodega San Martín" required /></label>
+        <div class="form-row">
+          <label class="form-field"><span>Entrega estimada</span><input name="fechaEntrega" type="date" [(ngModel)]="fechaEntrega" [min]="fechaMinimaEntrega" required /></label>
+          <label class="form-field"><span>Forma de pago</span>
+            <select name="metodoPago" [(ngModel)]="metodoPago">
+              <option>Crédito 30 días</option>
+              <option>Contado</option>
+              <option>Transferencia</option>
+            </select>
+          </label>
+        </div>
+        <label class="form-field"><span>Nota para la entrega <small>(opcional)</small></span><textarea name="notasPedido" [(ngModel)]="notasPedido" rows="2" maxlength="160" placeholder="Ej. Entregar por la puerta lateral"></textarea></label>
+        <p class="demo-notice">Al confirmar se descuenta el stock del catálogo y se guarda el detalle en Registros. Esta demo no envía datos a una API.</p>
+        <button class="checkout-button modal-submit" type="submit"><span>Confirmar pedido demo</span><svg lucideCheck [size]="17"></svg></button>
+      </form>
+    </section>
+  </div>
+}
+
+@if (modalRegistrosAbierto) {
+  <div class="modal-backdrop" (click)="modalRegistrosAbierto = false" (keydown.escape)="modalRegistrosAbierto = false">
+    <section class="checkout-modal records-modal" role="dialog" aria-modal="true" aria-labelledby="records-title" (click)="$event.stopPropagation()">
+      <button class="modal-close" type="button" (click)="modalRegistrosAbierto = false" aria-label="Cerrar registros"><svg lucideX [size]="19"></svg></button>
+      <span class="modal-kicker">HISTORIAL LOCAL</span>
+      <h2 id="records-title">Registros de pedidos</h2>
+      <p class="modal-intro">Pedidos de demostración guardados en este dispositivo.</p>
+
+      @if (registroRecienteFolio) {
+        <div class="record-success"><svg lucideCheck [size]="17"></svg><span><strong>Pedido {{ registroRecienteFolio }} registrado</strong><small>El detalle quedó guardado en el historial local.</small></span></div>
+      }
+
+      <div class="records-list">
+        @for (registro of registrosPedidos; track registro.folio) {
+          <article class="record-card">
+            <div class="record-heading">
+              <div><span class="record-folio">{{ registro.folio }}</span><strong>{{ registro.cliente }}</strong></div>
+              <strong class="record-total">{{ formatoPrecio(registro.total) }}</strong>
+            </div>
+            <div class="record-meta"><span>{{ registro.fecha }}</span><span>{{ registro.cantidad }} {{ registro.cantidad === 1 ? 'unidad' : 'unidades' }}</span><span class="record-status">Registrado</span></div>
+            <div class="record-meta record-extra"><span>Entrega: {{ registro.fechaEntrega }}</span><span>{{ registro.metodoPago }}</span></div>
+            @if (registro.contacto) { <p class="record-contacto">Contacto: {{ registro.contacto }}</p> }
+            @if (registro.notas) { <p class="record-contacto">Nota: {{ registro.notas }}</p> }
+            <details class="record-details">
+              <summary>Ver productos</summary>
+              @for (linea of registro.lineas; track linea.producto.id) {
+                <div class="record-line"><span>{{ linea.cantidad }} × {{ linea.producto.nombre }}</span><strong>{{ formatoPrecio(linea.cantidad * linea.producto.precio) }}</strong></div>
+              }
+            </details>
+          </article>
+        } @empty {
+          <div class="records-empty"><span class="cart-empty-icon"><svg lucideShoppingCart [size]="21"></svg></span><strong>Aún no hay pedidos registrados</strong><span>Al confirmar un pedido aparecerá aquí con su detalle.</span></div>
+        }
+      </div>
+
+      <button class="checkout-button records-done" type="button" (click)="modalRegistrosAbierto = false">Volver al catálogo</button>
+    </section>
+  </div>
+}
