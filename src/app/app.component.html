@@ -54,14 +54,14 @@
             <svg lucideWifiOff [size]="15"></svg><span>SIN CONEXIÓN</span>
           }
         </div>
-        <span class="topbar-date"><svg lucideClock [size]="15"></svg> Precios al 01 oct. 2026</span>
+        <span class="topbar-date"><svg lucideClock [size]="15"></svg> Precios al {{ fechaActualPrecios }}</span>
       </div>
     </header>
 
     <main class="page-content">
       <section class="welcome-row" aria-labelledby="welcome-title">
         <div>
-          <p class="eyebrow">VIERNES, 02 DE OCTUBRE DE 2026 <span></span> RUTA LIMA CENTRO</p>
+          <p class="eyebrow">{{ fechaActualLarga }} <span></span> RUTA LIMA CENTRO</p>
           <h1 id="welcome-title">Buen día, Andre</h1>
           <p class="welcome-copy">Todo listo para tu próxima visita. Arma el pedido desde aquí.</p>
         </div>

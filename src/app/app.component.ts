@@ -164,6 +164,23 @@ export class AppComponent implements OnInit {
     return this.clienteActual.charAt(0).toUpperCase();
   }
 
+  get fechaActualPrecios(): string {
+    return new Intl.DateTimeFormat('es-PE', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    }).format(new Date()).replace('.', '');
+  }
+
+  get fechaActualLarga(): string {
+    return new Intl.DateTimeFormat('es-PE', {
+      weekday: 'long',
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    }).format(new Date()).toLocaleUpperCase('es-PE');
+  }
+
   get estadoConexion(): string {
     return this.conectado ? 'CONECTADO' : 'SIN CONEXIÓN';
   }
