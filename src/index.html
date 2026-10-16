@@ -5,13 +5,28 @@
   <title>Backus Ventas</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#102e57">
-  <meta name="description" content="Catálogo y pedidos de demostración con disponibilidad offline.">
+  <meta name="theme-color" content="#0b1222">
+  <meta name="description" content="Backus Ventas PWA - Catálogo y registro de pedidos con soporte offline y sincronización.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="manifest" href="manifest.webmanifest">
 </head>
 <body>
   <app-root></app-root>
-  <noscript>Please enable JavaScript to continue using this application.</noscript>
+  <noscript>Por favor active JavaScript para usar Backus Ventas PWA.</noscript>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((reg) => {
+            console.log('[PWA] Service Worker activo:', reg.scope);
+            if (reg.update) reg.update();
+          })
+          .catch((err) => console.warn('[PWA] Error SW:', err));
+      });
+    }
+  </script>
 </body>
 </html>

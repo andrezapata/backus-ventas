@@ -1,17 +1,111 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
 
 :root {
-	color-scheme: light;
-	font-family: 'DM Sans', 'Segoe UI', sans-serif;
-	font-synthesis: none;
-	text-rendering: optimizeLegibility;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-	background: #f3f6f8;
+  color-scheme: dark;
+  --bg-deep: #070b14;
+  --bg-surface: #0d1527;
+  --bg-card: #121e36;
+  --bg-card-hover: #182847;
+  --bg-inset: #090e1c;
+  --gold-primary: #f59e0b;
+  --gold-light: #fbbf24;
+  --gold-metallic: #d4af37;
+  --gold-glow: rgba(245, 158, 11, 0.28);
+  --gold-border: rgba(212, 175, 55, 0.45);
+  --gold-stitch: rgba(245, 158, 11, 0.55);
+  --blue-brand: #1e3a8a;
+  --blue-accent: #3b82f6;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --text-gold: #fde68a;
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+
+  font-family: 'Plus Jakarta Sans', 'Outfit', system-ui, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-deep);
+  color: var(--text-primary);
 }
 
-* { box-sizing: border-box; }
-html { min-width: 320px; min-height: 100%; }
-body { min-width: 320px; min-height: 100vh; margin: 0; font-family: 'DM Sans', 'Segoe UI', sans-serif; }
-button, input { font: inherit; }
-h1, h2, h3, .brand-name { font-family: 'Manrope', 'DM Sans', sans-serif; }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  min-width: 320px;
+  min-height: 100%;
+  background: var(--bg-deep);
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background: radial-gradient(circle at 50% 0%, #15223d 0%, #070b14 70%);
+  color: var(--text-primary);
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+button, input, select, textarea {
+  font: inherit;
+  color: inherit;
+}
+
+h1, h2, h3, .font-cinzel, .brand-title {
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.5px;
+}
+
+.font-mono {
+  font-family: 'Space Mono', monospace;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #090e1c;
+}
+::-webkit-scrollbar-thumb {
+  background: #1f3052;
+  border-radius: 4px;
+  border: 1px solid rgba(212, 175, 55, 0.25);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #d4af37;
+}
+
+/* Bordados y puntadas artesanales (Stitched embroidery styles) */
+.bordado-gold {
+  position: relative;
+  border: 1.5px solid var(--gold-border);
+  outline: 1.5px dashed var(--gold-stitch);
+  outline-offset: -5px;
+  border-radius: 8px;
+}
+
+.bordado-gold-accent {
+  position: relative;
+  border: 2px solid #d4af37;
+  outline: 2px dashed rgba(251, 191, 36, 0.7);
+  outline-offset: -7px;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.18), inset 0 0 15px rgba(245, 158, 11, 0.08);
+}
+
+.bordado-stitch-horizontal {
+  background-image: repeating-linear-gradient(90deg, #d4af37, #d4af37 6px, transparent 6px, transparent 12px);
+  height: 2px;
+  width: 100%;
+}

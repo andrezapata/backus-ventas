@@ -1,5 +1,7 @@
 [
-  { "id": 1, "nombre": "Cristal 620 ml", "categoria": "Cerveza", "precio": 3.4, "stock": 120 },
-  { "id": 2, "nombre": "Pilsen Callao 620 ml", "categoria": "Cerveza", "precio": 3.2, "stock": 95 },
-  { "id": 3, "nombre": "Cusqueña 620 ml", "categoria": "Cerveza", "precio": 4.1, "stock": 70 }
+  { "id": 1, "nombre": "Cristal 620 ml", "categoria": "Cerveza", "precio": 7.5, "stock": 120 },
+  { "id": 2, "nombre": "Pilsen Callao 620 ml", "categoria": "Cerveza", "precio": 8.0, "stock": 95 },
+  { "id": 3, "nombre": "Cusqueña 620 ml", "categoria": "Cerveza", "precio": 9.0, "stock": 70 },
+  { "id": 4, "nombre": "Agua San Mateo Sin Gas 600 ml", "categoria": "Agua", "precio": 2.5, "stock": 150 },
+  { "id": 5, "nombre": "Agua San Mateo Con Gas 600 ml", "categoria": "Agua", "precio": 2.5, "stock": 130 }
 ]

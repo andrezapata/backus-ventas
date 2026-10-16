@@ -1,279 +1,518 @@
 <div class="app-shell">
-  <aside class="sidebar" aria-label="Navegación principal">
-    <a class="brand" href="#inicio" aria-label="Backus Ventas, inicio">
-      <span class="brand-mark">B<span>.</span></span>
-      <span class="brand-name">Backus<span>Ventas</span></span>
-    </a>
+  <!-- BARRA LATERAL EJECUTIVA CON BORDADOS -->
+  <aside class="sidebar bordado-sidebar" aria-label="Navegación principal">
+    <div class="brand-container">
+      <div class="brand-crest bordado-gold">
+        <span class="crest-letter">B</span>
+        <span class="crest-stars">★ ★ ★</span>
+      </div>
+      <div class="brand-text">
+        <span class="brand-main">BACKUS</span>
+        <span class="brand-sub">VENTAS PWA</span>
+      </div>
+    </div>
 
-    <div class="sidebar-group">
-      <p class="sidebar-caption">VENTAS</p>
-      <a class="nav-link is-active" href="#catalog-title" aria-current="page" aria-label="Catálogo" title="Catálogo">
+    <div class="embroidery-separator"></div>
+
+    <div class="sidebar-menu">
+      <div class="menu-kicker">PANEL DE RUTA</div>
+      <a class="nav-item is-active" href="#catalogo">
         <svg lucideStore [size]="18"></svg>
         <span>Catálogo</span>
         <span class="nav-count">{{ productos.length }}</span>
       </a>
-      <a class="nav-link" href="#order-title" aria-label="Pedido actual" title="Pedido actual">
+      <a class="nav-item" href="#pedido-pwa">
         <svg lucideShoppingCart [size]="18"></svg>
-        <span>Pedido actual</span>
+        <span>Carrito / Pedido</span>
         <span class="nav-count">{{ cantidadTotal }}</span>
       </a>
-      <button class="nav-link" type="button" (click)="abrirRegistros()" aria-label="Registros de pedidos" title="Registros de pedidos">
+      <button class="nav-item" type="button" (click)="abrirRegistros()">
         <svg lucideClock [size]="18"></svg>
         <span>Registros</span>
-        <span class="nav-count">{{ registrosPedidos.length }}</span>
+        <span class="nav-count" [class.has-pending]="pedidosPendientesCount > 0">
+          {{ registrosPedidos.length }}
+        </span>
       </button>
     </div>
 
-    <div class="sidebar-bottom">
-      <div class="sidebar-note">
-        <span class="note-dot"></span>
-        <div>
-          <strong>Modo de trabajo</strong>
-          <span>{{ conectado ? 'Catálogo listo en línea' : 'Catálogo disponible desde caché' }}</span>
+    <!-- PANEL DE CONTROL DE RED PWA -->
+    <div class="network-control-box bordado-gold">
+      <div class="control-header">
+        <span class="status-indicator" [class.is-online]="conectado" [class.is-offline]="!conectado"></span>
+        <div class="status-texts">
+          <strong class="font-cinzel">ESTADO DE RED</strong>
+          <span class="status-badge" [class.online-badge]="conectado" [class.offline-badge]="!conectado">
+            {{ estadoConexion }}
+          </span>
         </div>
       </div>
-      <div class="profile">
-        <div class="avatar">CM</div>
-        <div class="profile-copy">
+
+      <div class="pwa-cache-info">
+        <small>{{ conectado ? 'Conectado a servidor central' : 'Catálogo disponible desde caché' }}</small>
+      </div>
+
+      <button type="button" class="btn-toggle-network" (click)="toggleSimulacionRed()">
+        @if (conectado) {
+          <svg lucideWifi [size]="15"></svg>
+        } @else {
+          <svg lucideWifiOff [size]="15"></svg>
+        }
+        <span>{{ conectado ? 'Simular Modo Offline' : 'Reconectar Modo Online' }}</span>
+      </button>
+
+      @if (pedidosPendientesCount > 0) {
+        <button type="button" class="btn-sync-pending" (click)="sincronizarPedidosPendientes()" [disabled]="!conectado">
+          <span>Sincronizar ({{ pedidosPendientesCount }} pend.)</span>
+        </button>
+      }
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="user-badge bordado-gold">
+        <div class="user-avatar">AZ</div>
+        <div class="user-info">
           <strong>Andre Zapata</strong>
-          <span>Backus Ventas</span>
+          <small>Ruta Oficial Backus</small>
         </div>
-        <span class="profile-menu" aria-hidden="true">···</span>
       </div>
     </div>
   </aside>
 
-  <div class="main-column" id="inicio">
-    <header class="topbar">
-      <div class="breadcrumb"><span>Ventas</span><svg lucideChevronRight [size]="14"></svg><strong>Catálogo</strong></div>
-      <div class="topbar-actions">
-        <div class="connection-pill" [class.is-offline]="!conectado" role="status" aria-live="polite">
-          @if (conectado) {
-            <svg lucideWifi [size]="15"></svg><span>CONECTADO</span>
-          } @else {
-            <svg lucideWifiOff [size]="15"></svg><span>SIN CONEXIÓN</span>
-          }
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="main-content">
+    <!-- BARRA SUPERIOR -->
+    <header class="top-nav bordado-gold">
+      <div class="nav-brand-mobile">
+        <span class="font-cinzel gold-text">BACKUS VENTAS PWA</span>
+      </div>
+
+      <div class="top-pills">
+        <div class="status-pill" [class.pill-online]="conectado" [class.pill-offline]="!conectado">
+          <span class="pulse-dot"></span>
+          <span>ESTADO: {{ estadoConexion }}</span>
         </div>
-        <span class="topbar-date"><svg lucideClock [size]="15"></svg> Precios al {{ fechaActualPrecios }}</span>
+
+        <button type="button" class="btn-network-toggle-top" (click)="toggleSimulacionRed()">
+          @if (conectado) {
+            <svg lucideWifi [size]="14"></svg>
+          } @else {
+            <svg lucideWifiOff [size]="14"></svg>
+          }
+          <span>{{ conectado ? 'Probar Offline' : 'Probar Online' }}</span>
+        </button>
+
+        <div class="info-pill">
+          <svg lucideClock [size]="14"></svg>
+          <span>Precios oficiales al {{ fechaActualPrecios }}</span>
+        </div>
+
+        <button type="button" class="btn-records-top" (click)="abrirRegistros()">
+          <svg lucideClock [size]="14"></svg>
+          <span>Historial ({{ registrosPedidos.length }})</span>
+          @if (pedidosPendientesCount > 0) {
+            <span class="pending-tag">{{ pedidosPendientesCount }} PEND.</span>
+          }
+        </button>
       </div>
     </header>
 
-    <main class="page-content">
-      <section class="welcome-row" aria-labelledby="welcome-title">
-        <div>
-          <p class="eyebrow">{{ fechaActualLarga }} <span></span> RUTA LIMA CENTRO</p>
-          <h1 id="welcome-title">Buen día, Andre</h1>
-          <p class="welcome-copy">Todo listo para tu próxima visita. Arma el pedido desde aquí.</p>
-        </div>
-        <div class="route-tag"><span class="route-symbol">L</span><span><strong>Ruta 04</strong><small>Lima Centro</small></span></div>
-      </section>
+    <!-- BANNER DE ENCABEZADO CON BORDADOS -->
+    <section class="hero-banner bordado-gold-accent">
+      <div class="hero-ornament-left">❖</div>
+      <div class="hero-text-container">
+        <div class="hero-tag">SISTEMA PWA DE VENTAS EN RUTA • BACKUS OFICIAL</div>
+        <h1 class="hero-title">BACKUS VENTAS PWA</h1>
+        <p class="hero-desc">
+          Catálogo con persistencia en caché offline, carrito de compras con registro local y sincronización inmediata.
+        </p>
+      </div>
+      <div class="hero-ornament-right">❖</div>
+    </section>
 
-      <section class="metric-strip" aria-label="Resumen del catálogo">
-        <div class="metric">
-          <span class="metric-icon blue-icon"><svg lucideStore [size]="18"></svg></span>
-          <div><span class="metric-label">Productos disponibles</span><strong>{{ productos.length }} <small>referencias</small></strong></div>
+    <!-- DISTRIBUCIÓN PRINCIPAL DE VENTAS: CATÁLOGO + MÓDULO DE CARRITO Y PEDIDO -->
+    <div class="sales-main-layout">
+      <!-- COLUMNA IZQUIERDA: CATÁLOGO DE PRODUCTOS -->
+      <section id="catalogo" class="catalog-main-column">
+        <div class="section-title-wrap">
+          <div class="section-stitch"></div>
+          <h2 class="section-title font-cinzel">CATÁLOGO DE PRODUCTOS</h2>
+          <div class="section-stitch"></div>
         </div>
-        <div class="metric-divider"></div>
-        <div class="metric">
-          <span class="metric-icon green-icon"><span class="stock-mark">↗</span></span>
-          <div><span class="metric-label">Unidades en catálogo</span><strong>{{ stockDisponibleTotal }} <small>unidades</small></strong></div>
-        </div>
-        <div class="metric-divider"></div>
-        <div class="metric">
-          <span class="metric-icon red-icon"><svg lucideShoppingCart [size]="18"></svg></span>
-          <div><span class="metric-label">Tu pedido</span><strong>{{ cantidadTotal }} <small>unidades</small></strong></div>
-        </div>
-        <div class="metric-aside"><span class="live-dot"></span> Catálogo académico</div>
-      </section>
 
-      <div class="sales-layout">
-        <section class="catalog-section" aria-labelledby="catalog-title">
-          <div class="catalog-heading">
-            <div>
-              <div class="section-kicker">PORTAFOLIO</div>
-              <h2 id="catalog-title">Catálogo de productos</h2>
-              <p>Precios y stock son datos ficticios para este ejercicio.</p>
-            </div>
-            <label class="search-box">
-              <svg lucideSearch [size]="18"></svg>
-              <input type="search" placeholder="Buscar producto" [(ngModel)]="busqueda" aria-label="Buscar producto" />
-              <kbd>/</kbd>
-            </label>
+        <div class="catalog-toolbar">
+          <div class="client-picker bordado-gold">
+            <span class="picker-label">CLIENTE:</span>
+            <strong>{{ clienteActual }}</strong>
+            <button type="button" class="btn-change-client" (click)="cambiarCliente()">Cambiar</button>
           </div>
 
-          <div class="catalog-toolbar">
-            <div class="category-tabs" role="group" aria-label="Filtrar por categoría">
-              @for (categoria of categorias; track categoria) {
-                <button type="button" class="category-tab" [class.is-selected]="categoriaActiva === categoria" (click)="categoriaActiva = categoria">
-                  {{ categoria }}
-                </button>
-              }
-            </div>
-            <span class="result-count">{{ productosVisibles.length }} resultados</span>
+          <div class="search-wrap bordado-gold">
+            <svg lucideSearch [size]="16"></svg>
+            <input
+              type="search"
+              placeholder="Buscar producto (Cristal, Pilsen, San Mateo...)"
+              [(ngModel)]="busqueda"
+              class="search-field"
+            />
           </div>
+        </div>
 
-          @if (cargando) {
-            <div class="state-panel"><span class="loading-ring"></span><span>Cargando catálogo...</span></div>
-          } @else if (errorCatalogo) {
-            <div class="state-panel error-state"><strong>No se pudo cargar el catálogo.</strong><span>Conéctate o vuelve a intentarlo cuando el recurso esté disponible.</span></div>
-          } @else {
-            <div class="product-grid">
-              @for (producto of productosVisibles; track producto.id) {
-                <article class="product-card">
-                  <div class="product-visual" [class.product-one]="producto.id === 1" [class.product-two]="producto.id === 2" [class.product-three]="producto.id === 3">
-                    <img [ngSrc]="imagenesProducto[producto.id]" [width]="dimensionesImagen[producto.id].width" [height]="dimensionesImagen[producto.id].height" [priority]="producto.id === 1" [alt]="producto.nombre" />
-                    <span class="product-family">{{ producto.categoria }}</span>
-                    <span class="product-number">0{{ producto.id }}</span>
-                  </div>
-                  <div class="product-details">
-                    <div class="product-title-row"><span class="product-category">{{ producto.categoria }}</span><span class="stock-status"><i></i> En stock</span></div>
-                    <h3>{{ producto.nombre }}</h3>
-                    <div class="product-bottom">
-                      <div><strong class="product-price">{{ formatoPrecio(producto.precio) }}</strong><span class="price-unit">por unidad</span></div>
-                      <button class="add-button" type="button" (click)="agregar(producto)" [disabled]="cantidadEnCarrito(producto.id) >= producto.stock" [attr.aria-label]="'Agregar ' + producto.nombre + ' al pedido'">
-                        <svg lucidePlus [size]="17"></svg>
+        <!-- FILTROS POR CATEGORÍA -->
+        <div class="category-tabs-row">
+          @for (cat of categorias; track cat) {
+            <button
+              type="button"
+              class="cat-tab-btn"
+              [class.active-cat]="categoriaActiva === cat"
+              (click)="categoriaActiva = cat">
+              {{ cat }}
+            </button>
+          }
+        </div>
+
+        <!-- CARDS DE PRODUCTOS CON BORDADOS Y BORDES DORADOS -->
+        <div class="products-grid">
+          @for (prod of productosVisibles; track prod.id) {
+            <article class="beer-card bordado-gold">
+              <div class="card-stitched-frame">
+                <div class="card-badge">
+                  <span class="stock-badge">
+                    <span class="badge-dot"></span> Stock: {{ prod.stock }} und.
+                  </span>
+                  <span class="item-sku">REF #0{{ prod.id }}</span>
+                </div>
+
+                <div class="card-image-wrap">
+                  <img
+                    [src]="imagenesProducto[prod.id]"
+                    [alt]="prod.nombre"
+                    class="product-image"
+                    loading="lazy"
+                  />
+                </div>
+
+                <div class="card-body">
+                  <span class="product-category-tag font-cinzel">{{ prod.categoria }}</span>
+                  <h3 class="product-card-title font-cinzel">{{ prod.nombre }}</h3>
+
+                  <div class="price-row">
+                    <div class="price-block">
+                      <span class="price-caption">Precio unitario:</span>
+                      <strong class="price-val gold-text">{{ formatoPrecio(prod.precio) }}</strong>
+                    </div>
+
+                    <div class="qty-control bordado-gold">
+                      <button type="button" (click)="quitar(prod.id)" [disabled]="cantidadEnCarrito(prod.id) === 0">
+                        <svg lucideMinus [size]="14"></svg>
+                      </button>
+                      <span class="qty-num">{{ cantidadEnCarrito(prod.id) }}</span>
+                      <button type="button" (click)="agregar(prod)" [disabled]="cantidadEnCarrito(prod.id) >= prod.stock">
+                        <svg lucidePlus [size]="14"></svg>
                       </button>
                     </div>
-                    <div class="stock-line"><span>Disponible</span><strong>{{ producto.stock }} und.</strong></div>
                   </div>
-                </article>
-              } @empty {
-                <div class="empty-results"><span class="empty-search"><svg lucideSearch [size]="22"></svg></span><strong>No encontramos productos</strong><span>Prueba con otro nombre o categoría.</span></div>
-              }
-            </div>
-          }
 
-          <div class="catalog-footnote"><span class="footnote-mark">i</span><span>Los precios y existencias pueden cambiar. Confirma la información antes de cerrar una venta.</span></div>
-        </section>
-
-        <aside class="order-panel" aria-labelledby="order-title">
-          <div class="order-header">
-            <div><span class="section-kicker">VENTA EN CURSO</span><h2 id="order-title">Pedido actual</h2></div>
-            <span class="order-count">{{ cantidadTotal }}</span>
-          </div>
-
-          <div class="customer-select">
-            <span class="customer-initial">{{ inicialCliente }}</span>
-            <div><span class="customer-caption">CLIENTE</span><strong>{{ clienteActual }}</strong></div>
-            <button class="customer-change" type="button" (click)="cambiarCliente()" title="Cambiar cliente" aria-label="Cambiar cliente">···</button>
-          </div>
-
-          @if (carrito.length > 0) {
-            <div class="cart-items">
-              @for (linea of carrito; track linea.producto.id) {
-                <div class="cart-line">
-                  <div class="cart-product-copy"><strong>{{ linea.producto.nombre }}</strong><span>{{ formatoPrecio(linea.producto.precio) }} c/u</span></div>
-                  <div class="quantity-control">
-                    <button type="button" (click)="quitar(linea.producto.id)" [attr.aria-label]="'Quitar una unidad de ' + linea.producto.nombre"><svg lucideMinus [size]="13"></svg></button>
-                    <span>{{ linea.cantidad }}</span>
-                    <button type="button" (click)="agregar(linea.producto)" [disabled]="linea.cantidad >= linea.producto.stock" [attr.aria-label]="'Agregar una unidad de ' + linea.producto.nombre"><svg lucidePlus [size]="13"></svg></button>
-                  </div>
-                  <strong class="line-total">{{ formatoPrecio(linea.producto.precio * linea.cantidad) }}</strong>
+                  <button
+                    type="button"
+                    class="btn-add-cart font-cinzel"
+                    (click)="agregar(prod)"
+                    [disabled]="cantidadEnCarrito(prod.id) >= prod.stock">
+                    <span>AGREGAR AL CARRITO</span>
+                    <svg lucideShoppingCart [size]="15"></svg>
+                  </button>
                 </div>
-              }
-              <button class="clear-cart" type="button" (click)="vaciarCarrito()">Vaciar pedido</button>
-            </div>
-          } @else {
-            <div class="cart-empty">
-              <span class="cart-empty-icon"><svg lucideShoppingCart [size]="22"></svg></span>
-              <strong>Tu pedido está vacío</strong>
-              <span>Agrega productos del catálogo para empezar.</span>
-            </div>
+              </div>
+            </article>
           }
-
-          <div class="order-summary">
-            <div class="summary-row"><span>Subtotal</span><strong>{{ formatoPrecio(importeTotal) }}</strong></div>
-            <div class="summary-row muted-row"><span>IGV</span><span>Incluido</span></div>
-            <div class="summary-row muted-row"><span>Productos distintos</span><span>{{ cantidadLineas }}</span></div>
-            <div class="summary-total"><span>Total</span><strong>{{ formatoPrecio(importeTotal) }}</strong></div>
-            <button class="checkout-button" type="button" (click)="abrirCheckout()" [disabled]="carrito.length === 0">
-              <span>Continuar pedido</span><svg lucideChevronRight [size]="18"></svg>
-            </button>
-            <p class="order-disclaimer">Pedido académico de demostración. No se envía a una API.</p>
-          </div>
-        </aside>
-      </div>
-
-      @if (pedidoRegistrado) {
-        <div class="toast" [class.toast-warning]="pedidoRechazado" role="status" aria-live="polite">
-          <span class="toast-check">
-            @if (pedidoRechazado) { <svg lucideWifiOff [size]="16"></svg> } @else { <svg lucideCheck [size]="16"></svg> }
-          </span>
-          <span><strong>{{ pedidoRechazado ? 'Pedido guardado localmente' : 'Pedido ' + numeroPedido }}</strong><small>{{ mensajePedido }}</small></span>
-          <button type="button" (click)="pedidoRegistrado = false" aria-label="Cerrar aviso"><svg lucideX [size]="16"></svg></button>
         </div>
-      }
-    </main>
+      </section>
 
-    <footer class="page-footer"><span>BACKUS VENTAS <i>·</i> CASO ACADÉMICO</span><span>Runtime caching activo en producción</span></footer>
-  </div>
+      <!-- COLUMNA DERECHA: MÓDULO DEL CARRITO CON EL PROCEDIMIENTO EXACTO SOLICITADO -->
+      <aside id="pedido-pwa" class="cart-order-column">
+        <div class="pwa-box bordado-gold-accent">
+          <div class="box-inner-stitch">
+            <!-- CABECERA -->
+            <div class="box-top-border">
+              <span class="box-corner-ornament">╔</span>
+              <span class="box-header-title font-cinzel">BACKUS VENTAS PWA</span>
+              <span class="box-corner-ornament">╗</span>
+            </div>
+
+            <!-- ESTADO DE CONEXIÓN -->
+            <div class="box-status-row">
+              <span class="status-label">Estado:</span>
+              <span class="status-dot" [class.dot-green]="conectado" [class.dot-red]="!conectado"></span>
+              <strong class="status-value" [class.value-green]="conectado" [class.value-red]="!conectado">
+                {{ estadoConexion }}
+              </strong>
+              @if (!conectado) {
+                <span class="cache-badge">Modo Local</span>
+              }
+            </div>
+
+            <!-- CUANDO ESTÁ SIN CONEXIÓN: CATÁLOGO DESDE CACHÉ -->
+            @if (!conectado) {
+              <div class="offline-callout">
+                <div class="offline-line"><strong>Catálogo disponible</strong></div>
+                <div class="offline-line"><strong>desde caché</strong></div>
+              </div>
+            }
+
+            <div class="box-divider-stitch"></div>
+
+            <!-- LISTA DE PRODUCTOS Y PRECIOS DEL CATÁLOGO -->
+            <div class="box-catalog-block">
+              <div class="catalog-caption font-cinzel">Catálogo</div>
+              <ul class="catalog-receipt-list">
+                @for (prod of productos; track prod.id) {
+                  <li class="receipt-item" [class.item-selected]="cantidadEnCarrito(prod.id) > 0">
+                    <div class="item-name-group">
+                      <span class="item-bullet">◆</span>
+                      <span class="item-name">{{ prod.nombre }}</span>
+                    </div>
+                    <div class="item-action-group">
+                      <strong class="item-price">{{ formatoPrecio(prod.precio) }}</strong>
+                      <div class="mini-counter">
+                        <button type="button" (click)="quitar(prod.id)" [disabled]="cantidadEnCarrito(prod.id) === 0" title="Quitar">-</button>
+                        <span>{{ cantidadEnCarrito(prod.id) }}</span>
+                        <button type="button" (click)="agregar(prod)" [disabled]="prod.stock <= cantidadEnCarrito(prod.id)" title="Agregar">+</button>
+                      </div>
+                    </div>
+                  </li>
+                }
+              </ul>
+            </div>
+
+            <!-- RESUMEN DEL TOTAL -->
+            <div class="cart-summary-line">
+              <span>Unidades en carrito: <strong>{{ cantidadTotal }}</strong></span>
+              <span>Total: <strong class="gold-text">{{ formatoPrecio(importeTotal) }}</strong></span>
+            </div>
+
+            <div class="box-divider-stitch"></div>
+
+            <!-- ACCIÓN: REGISTRAR PEDIDO + CAMPO MENSAJE + BOTÓN GUARDAR -->
+            <div class="box-actions-block">
+              <button
+                type="button"
+                class="btn-register-pwa font-cinzel"
+                (click)="abrirCheckout()"
+                [disabled]="cantidadTotal === 0 && productos.length === 0">
+                [ Registrar pedido ]
+              </button>
+
+              <div class="box-message-row">
+                <label for="mensajeInput" class="message-label">Mensaje</label>
+                <div class="message-input-wrapper">
+                  <input
+                    id="mensajeInput"
+                    type="text"
+                    [(ngModel)]="mensajeModulo"
+                    placeholder="Escribe aquí el mensaje..."
+                    class="message-input font-mono"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="button"
+                class="btn-save-pwa font-cinzel"
+                (click)="guardarDesdeModulo()">
+                [ Guardar ]
+              </button>
+            </div>
+
+            <!-- FEEDBACK DEL PEDIDO: SI ES OFFLINE MUESTRA 'Pedido guardado localmente' y 'Estado: PENDIENTE' -->
+            @if (ultimoEstadoModulo) {
+              <div class="box-feedback" [class.feedback-pending]="!conectado || pedidoGuardadoLocalmente">
+                <div class="feedback-title">
+                  @if (!conectado || pedidoGuardadoLocalmente) {
+                    <span>Pedido guardado localmente</span>
+                    <strong class="pending-badge">Estado: PENDIENTE</strong>
+                  } @else {
+                    <span>{{ ultimoEstadoModulo }}</span>
+                  }
+                </div>
+              </div>
+            }
+
+            <div class="box-bottom-border">
+              <span class="box-corner-ornament">╚</span>
+              <span class="box-footer-note font-mono">PWA OFFLINE PERSISTENCE</span>
+              <span class="box-corner-ornament">╝</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- TOAST INFORMATIVO -->
+    @if (pedidoRegistrado) {
+      <div class="toast-card bordado-gold-accent" [class.toast-pending]="pedidoRechazado">
+        <div class="toast-icon">
+          @if (pedidoRechazado) {
+            <svg lucideWifiOff [size]="20"></svg>
+          } @else {
+            <svg lucideCheck [size]="20"></svg>
+          }
+        </div>
+        <div class="toast-content">
+          <strong>{{ pedidoRechazado ? 'Pedido guardado localmente (Estado: PENDIENTE)' : 'Pedido ' + numeroPedido }}</strong>
+          <span>{{ mensajePedido }}</span>
+        </div>
+        <button type="button" class="btn-toast-close" (click)="pedidoRegistrado = false">
+          <svg lucideX [size]="16"></svg>
+        </button>
+      </div>
+    }
+
+    <!-- PIE DE PÁGINA -->
+    <footer class="app-footer bordado-gold">
+      <div class="footer-stitch"></div>
+      <div class="footer-content">
+        <span class="font-cinzel gold-text">BACKUS VENTAS PWA • SISTEMA OFICIAL DE PEDIDOS</span>
+        <span>Tecnología PWA con Service Worker, Runtime Cache & Persistencia Offline</span>
+      </div>
+    </footer>
+  </main>
 </div>
 
+<!-- MODAL DE CHECKOUT DETALLADO -->
 @if (checkoutAbierto) {
-  <div class="modal-backdrop" (click)="checkoutAbierto = false" (keydown.escape)="checkoutAbierto = false">
-    <section class="checkout-modal" role="dialog" aria-modal="true" aria-labelledby="checkout-title" (click)="$event.stopPropagation()">
-      <button class="modal-close" type="button" (click)="checkoutAbierto = false" aria-label="Cerrar"><svg lucideX [size]="19"></svg></button>
-      <span class="modal-kicker">RESUMEN DE VENTA</span>
-      <h2 id="checkout-title">Registrar pedido</h2>
-      <p class="modal-intro">Revisa el total e identifica al cliente para crear el registro de demostración.</p>
-      <div class="modal-total"><span>{{ cantidadTotal }} {{ cantidadTotal === 1 ? 'producto' : 'productos' }}</span><strong>{{ formatoPrecio(importeTotal) }}</strong></div>
-      <form (ngSubmit)="registrarPedido()">
-        <label class="form-field"><span>Nombre del contacto</span><input name="nombreCliente" [(ngModel)]="nombreCliente" autocomplete="name" placeholder="Ej. María Pérez" required /></label>
-        <label class="form-field"><span>Nombre del negocio</span><input name="nombreNegocio" [(ngModel)]="nombreNegocio" autocomplete="organization" placeholder="Ej. Bodega San Martín" required /></label>
-        <div class="form-row">
-          <label class="form-field"><span>Entrega estimada</span><input name="fechaEntrega" type="date" [(ngModel)]="fechaEntrega" [min]="fechaMinimaEntrega" required /></label>
-          <label class="form-field"><span>Forma de pago</span>
-            <select name="metodoPago" [(ngModel)]="metodoPago">
-              <option>Crédito 30 días</option>
-              <option>Contado</option>
-              <option>Transferencia</option>
-            </select>
-          </label>
+  <div class="modal-overlay" (click)="checkoutAbierto = false">
+    <div class="modal-box bordado-gold-accent" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="font-cinzel gold-text">REGISTRAR PEDIDO</h3>
+        <button type="button" class="btn-modal-close" (click)="checkoutAbierto = false">
+          <svg lucideX [size]="18"></svg>
+        </button>
+      </div>
+
+      <div class="modal-status-strip" [class.strip-online]="conectado" [class.strip-offline]="!conectado">
+        <span>Estado: <strong>{{ estadoConexion }}</strong></span>
+        <small>{{ conectado ? 'El pedido se guardará en línea' : 'Pedido guardado localmente · Estado: PENDIENTE' }}</small>
+      </div>
+
+      <div class="modal-summary bordado-gold">
+        <div class="summary-line">
+          <span>Total de productos:</span>
+          <strong>{{ cantidadTotal }} unidades</strong>
         </div>
-        <label class="form-field"><span>Nota para la entrega <small>(opcional)</small></span><textarea name="notasPedido" [(ngModel)]="notasPedido" rows="2" maxlength="160" placeholder="Ej. Entregar por la puerta lateral"></textarea></label>
-        <p class="demo-notice">Al confirmar se descuenta el stock del catálogo y se guarda el detalle en Registros. Esta demo no envía datos a una API.</p>
-        <button class="checkout-button modal-submit" type="submit"><span>Confirmar pedido demo</span><svg lucideCheck [size]="17"></svg></button>
+        <div class="summary-line">
+          <span>Importe total:</span>
+          <strong class="gold-text">{{ formatoPrecio(importeTotal) }}</strong>
+        </div>
+      </div>
+
+      <form (ngSubmit)="registrarPedido()" class="checkout-form">
+        <div class="form-group">
+          <label>Nombre del Contacto / Responsable</label>
+          <input [(ngModel)]="nombreCliente" name="nombreCliente" placeholder="Ej. Juan Pérez" required />
+        </div>
+
+        <div class="form-group">
+          <label>Nombre del Negocio / Bodega</label>
+          <input [(ngModel)]="nombreNegocio" name="nombreNegocio" placeholder="Ej. Bodega San Martín" required />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Fecha de Entrega</label>
+            <input type="date" [(ngModel)]="fechaEntrega" name="fechaEntrega" [min]="fechaMinimaEntrega" required />
+          </div>
+          <div class="form-group">
+            <label>Forma de Pago</label>
+            <select [(ngModel)]="metodoPago" name="metodoPago">
+              <option>Crédito 30 días</option>
+              <option>Contado contra entrega</option>
+              <option>Transferencia bancaria</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Mensaje / Notas para el pedido</label>
+          <textarea [(ngModel)]="notasPedido" name="notasPedido" rows="2" placeholder="Ej. Entregar en la mañana por la puerta lateral..."></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel font-cinzel" (click)="checkoutAbierto = false">Cancelar</button>
+          <button type="submit" class="btn-confirm font-cinzel">
+            {{ conectado ? 'Guardar Pedido' : 'Guardar Localmente (Pendiente)' }}
+          </button>
+        </div>
       </form>
-    </section>
+    </div>
   </div>
 }
 
+<!-- MODAL DE HISTORIAL DE REGISTROS -->
 @if (modalRegistrosAbierto) {
-  <div class="modal-backdrop" (click)="modalRegistrosAbierto = false" (keydown.escape)="modalRegistrosAbierto = false">
-    <section class="checkout-modal records-modal" role="dialog" aria-modal="true" aria-labelledby="records-title" (click)="$event.stopPropagation()">
-      <button class="modal-close" type="button" (click)="modalRegistrosAbierto = false" aria-label="Cerrar registros"><svg lucideX [size]="19"></svg></button>
-      <span class="modal-kicker">HISTORIAL LOCAL</span>
-      <h2 id="records-title">Registros de pedidos</h2>
-      <p class="modal-intro">Pedidos de demostración guardados en este dispositivo.</p>
+  <div class="modal-overlay" (click)="modalRegistrosAbierto = false">
+    <div class="modal-box records-modal bordado-gold-accent" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="font-cinzel gold-text">HISTORIAL DE PEDIDOS REGISTRADOS</h3>
+        <button type="button" class="btn-modal-close" (click)="modalRegistrosAbierto = false">
+          <svg lucideX [size]="18"></svg>
+        </button>
+      </div>
 
-      @if (registroRecienteFolio) {
-        <div class="record-success"><svg lucideCheck [size]="17"></svg><span><strong>Pedido {{ registroRecienteFolio }} registrado</strong><small>El detalle quedó guardado en el historial local.</small></span></div>
-      }
-
-      <div class="records-list">
-        @for (registro of registrosPedidos; track registro.folio) {
-          <article class="record-card">
-            <div class="record-heading">
-              <div><span class="record-folio">{{ registro.folio }}</span><strong>{{ registro.cliente }}</strong></div>
-              <strong class="record-total">{{ formatoPrecio(registro.total) }}</strong>
-            </div>
-            <div class="record-meta"><span>{{ registro.fecha }}</span><span>{{ registro.cantidad }} {{ registro.cantidad === 1 ? 'unidad' : 'unidades' }}</span><span class="record-status" [class.record-pending]="registro.estado === 'PENDIENTE'">{{ registro.estado }}</span></div>
-            <div class="record-meta record-extra"><span>Entrega: {{ registro.fechaEntrega }}</span><span>{{ registro.metodoPago }}</span></div>
-            @if (registro.contacto) { <p class="record-contacto">Contacto: {{ registro.contacto }}</p> }
-            @if (registro.notas) { <p class="record-contacto">Nota: {{ registro.notas }}</p> }
-            <details class="record-details">
-              <summary>Ver productos</summary>
-              @for (linea of registro.lineas; track linea.producto.id) {
-                <div class="record-line"><span>{{ linea.cantidad }} × {{ linea.producto.nombre }}</span><strong>{{ formatoPrecio(linea.cantidad * linea.producto.precio) }}</strong></div>
-              }
-            </details>
-          </article>
-        } @empty {
-          <div class="records-empty"><span class="cart-empty-icon"><svg lucideShoppingCart [size]="21"></svg></span><strong>Aún no hay pedidos registrados</strong><span>Al confirmar un pedido aparecerá aquí con su detalle.</span></div>
+      <div class="records-header-summary">
+        <div>
+          <span>Total en memoria: <strong>{{ registrosPedidos.length }} pedidos</strong></span>
+        </div>
+        @if (pedidosPendientesCount > 0) {
+          <button type="button" class="btn-sync-all font-cinzel" (click)="sincronizarPedidosPendientes()" [disabled]="!conectado">
+            ⚡ Sincronizar {{ pedidosPendientesCount }} pendientes
+          </button>
         }
       </div>
 
-      <button class="checkout-button records-done" type="button" (click)="modalRegistrosAbierto = false">Volver al catálogo</button>
-    </section>
+      <div class="records-scroll-list">
+        @for (reg of registrosPedidos; track reg.folio) {
+          <article class="record-item bordado-gold" [class.item-pending]="reg.estado === 'PENDIENTE'">
+            <div class="record-head">
+              <span class="record-folio font-mono">{{ reg.folio }}</span>
+              <span class="record-badge" [class.badge-registered]="reg.estado === 'REGISTRADO'" [class.badge-pending]="reg.estado === 'PENDIENTE'">
+                {{ reg.estado }}
+              </span>
+            </div>
+
+            <div class="record-body">
+              <strong>{{ reg.cliente }}</strong>
+              <small>{{ reg.fecha }} • {{ reg.metodoPago }}</small>
+              @if (reg.notas) {
+                <p class="record-note"><em>Mensaje:</em> {{ reg.notas }}</p>
+              }
+            </div>
+
+            <div class="record-items-list">
+              @for (item of reg.lineas; track item.producto.id) {
+                <div class="record-subline">
+                  <span>{{ item.cantidad }} × {{ item.producto.nombre }}</span>
+                  <span>{{ formatoPrecio(item.cantidad * item.producto.precio) }}</span>
+                </div>
+              }
+            </div>
+
+            <div class="record-foot">
+              <span>Total:</span>
+              <strong class="gold-text">{{ formatoPrecio(reg.total) }}</strong>
+            </div>
+          </article>
+        } @empty {
+          <div class="empty-records">
+            <svg lucideClock [size]="32"></svg>
+            <p>No hay pedidos registrados todavía.</p>
+          </div>
+        }
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-modal-close-wide font-cinzel" (click)="modalRegistrosAbierto = false">
+          Cerrar
+        </button>
+      </div>
+    </div>
   </div>
 }
